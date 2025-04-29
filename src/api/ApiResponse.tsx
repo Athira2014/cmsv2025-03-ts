@@ -1,7 +1,5 @@
-import { Patient } from "../model/Patient";
-
-export interface ApiResponse {
+export interface ApiResponse<T> {
     status: number;
-    data: Patient[];
+    data: T;
     error: any;
   }

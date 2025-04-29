@@ -2,8 +2,6 @@ import React, { FormEvent, useState } from "react";
 import { BrowserRouter as Router, Routes, Route, useLocation, useNavigate } from "react-router-dom";
 // Correct import order:
 // import "bootstrap/dist/css/bootstrap.min.css";
-import { Link } from "react-router-dom";
-import { Alert } from "react-bootstrap";
 import { Form } from 'react-bootstrap';
 import Api from "../api/Api";
 import axios from "axios";
@@ -99,6 +97,7 @@ const AddPatient: React.FC = () => {
             if (response.status === 200 || response.status === 201) {
                 navigate("/");
             }
+            setError(null);
         } catch (error) {
             setError("Error adding patient. Please try again.");
         }

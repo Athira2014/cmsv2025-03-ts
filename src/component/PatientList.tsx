@@ -24,7 +24,7 @@ const PatientList: React.FC = () => {
     const fetchPatients = (async () => {
         try {
             setIsLoading(true);
-            const response = await axios.get<ApiResponse>(Api.patientList);
+            const response = await axios.get<ApiResponse<Patient[]>>(Api.patientList);
             setPatients(response.data.data)
             setError(null);
         } catch (error) {

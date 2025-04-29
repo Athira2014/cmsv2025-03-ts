@@ -10,7 +10,7 @@ export interface Doctor{
     specialization ?: Specialization,
     specializationId : number,
     fee : number,
-    licenceNo : number,
+    licenceNo : string,
     createdDate : string,
     appintments : Appointment[],
     doctorsAvailabilities : DoctorsAvailability[],
