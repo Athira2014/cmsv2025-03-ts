@@ -15,6 +15,7 @@ export interface Staff{
     salary : number,
     status : string,
     address : string,
+    roleId :number,
     doctor ?: Doctor,
     staffAttendances : StaffAttendance[]
 }

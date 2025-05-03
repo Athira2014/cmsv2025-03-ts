@@ -1,6 +1,6 @@
 export interface Permission{
     permissionId : number,
     permission : string,
-    isActive : boolean,
+    active : boolean,
     createdDate : String
 }

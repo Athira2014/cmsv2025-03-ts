@@ -4,6 +4,8 @@ import axios from "axios";
 import Api from "../api/Api";
 import Container from "react-bootstrap/Container";
 import { ApiResponse } from "../api/ApiResponse";
+import Button from "react-bootstrap/Button";
+import { useNavigate } from "react-router-dom";
 
 const StaffList: React.FC = () => {
 
@@ -12,6 +14,8 @@ const StaffList: React.FC = () => {
     const [error, setError] = useState<string | null>(null)
 
     const [isLoading, setIsLoading] = useState(true)
+
+    const navigate = useNavigate()
 
     const fetchStaff = useCallback(async () => {
         try {
@@ -31,6 +35,11 @@ const StaffList: React.FC = () => {
         fetchStaff();
     }, [])
 
+    const handleEdit = (staff: Staff) =>{
+        //    navigate(`${Api.getStaff}/${staff.staffId}`);
+        navigate(`/staff/3/${staff.staffId}`)
+    }
+
     return (
         <div className="container-dashboard">
             <div className="card shadow p-4">
@@ -49,7 +58,8 @@ const StaffList: React.FC = () => {
                                 <th>Till</th>
                                 <th>Salary</th>
                                 <th>Status</th>
-                                <th>address</th>
+                                <th>Address</th>
+                                <th>Action</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -67,6 +77,11 @@ const StaffList: React.FC = () => {
                                     <td>{staff.salary}</td>
                                     <td>{staff.status}</td>
                                     <td>{staff.address}</td>
+                                    <td>
+                                        <Button variant = "secondary" type = "button" onClick={()=> handleEdit(staff)}>
+                                            Edit
+                                        </Button>
+                                    </td>
                                 </tr>
                             ))}
                         </tbody>

@@ -33,9 +33,9 @@ const AddPermission: React.FC = () => {
         if (!validateForm) return;
 
         try {
-            const response = await axios.post(Api.addPermission)
+            const response = await axios.post(Api.addPermission, permissionObj)
             if (response.status === 200 || response.status === 201) {
-                navigate(Api.addPermission)
+                navigate(`${Api.permissionList}`)
             }
             setError(null)
         } catch (error) {
@@ -70,6 +70,7 @@ const AddPermission: React.FC = () => {
                                 name="permission"
                                 type="text"
                                 value={permissionObj.permission}
+                                onChange={handleInputChange}
                                 isInvalid={!!validationErrors.permission}
                             />
                             <Form.Control.Feedback type="invalid">

@@ -5,6 +5,7 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { Button } from "react-bootstrap";
 import AddPermission from "./AddPermission";
+import { ApiResponse } from "../api/ApiResponse";
 
 const PermissionList: React.FC = () => {
 
@@ -20,33 +21,25 @@ const PermissionList: React.FC = () => {
     const navivagate = useNavigate();
 
     // Memorized function to fetch permissions from API
-    const fetchPermissions = useCallback(async() => {
-
+    const fetchPermissions = useCallback(async () => {
+        setIsLoading(true);
         try {
-            setIsLoading(true);
-            const response = await axios.get<Permission[]>(Api.permissionList)
-            if(response.status === 200 || response.status === 201){
-                navivagate(Api.patientList)
-            }
-            setError(null)
+            const response = await axios.get<ApiResponse<Permission[]>>(Api.permissionList);
+            setPermissions(response.data.data);
+            console.log(response.data.data)
+            setError(null); // Clear any previous error
         } catch (error) {
-            setError("Error occure while fetching permissions.")
-        } finally{
-            setIsLoading(false)
+            setError("Error occurred while fetching permissions.");
+        } finally {
+            setIsLoading(false);
         }
-
-    }, [])
-
+    }, []);
+    
      // Effect hook to fetch employees when component mounts
     // useEffect is the first method executed when a componet is loaded
     useEffect(() => {
         fetchPermissions();
     }, [])
-
-    // implement function later
-    function updateOrDisablePermission(permission: Permission): React.FormEventHandler<HTMLButtonElement> | undefined {
-        throw new Error("Function not implemented.");
-    }
 
     //Component rendering
     return (
@@ -71,10 +64,10 @@ const PermissionList: React.FC = () => {
                                 {/* serial number starts from 1 */}
                                 <td>{index+1}</td> 
                                 <td>{permission.permission}</td>
-                                <td>{permission.isActive ? 'Active' : 'Inactive'}</td>
+                                <td>{permission.active ? 'Active' : 'Inactive'}</td>
                                 <td>
-                                    <Button variant ="secondary" type="submit" onClick={updateOrDisablePermission(permission)}>Edit</Button>
-                                    <Button variant="secondary" type="submit" onClick={updateOrDisablePermission(permission)}>Disable</Button>
+                                    {/* <Button variant ="secondary" type="submit" onClick={updateOrDisablePermission(permission)}>Edit</Button>
+                                    <Button variant="secondary" type="submit" onClick={updateOrDisablePermission(permission)}>Disable</Button> */}
                                 </td>
                             </tr>
                         ))}

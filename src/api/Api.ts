@@ -18,13 +18,16 @@ const Api = {
     addPatient: `${BASE_URL}/addPatients/1`,
     addSpecializations: `${BASE_URL}/addSpecializations`,
     addDoctor : `${BASE_URL}/doctors`,
+    upadteDoctor : `${BASE_URL}/doctors`,
     addPermission: `${BASE_URL}/admin/permissions`,
     permissionList: `${BASE_URL}/admin/permissions`,
     addRole: `${BASE_URL}/admin/roles`,
     roles: `${BASE_URL}/admin/roles`,
     staffs: `${BASE_URL}/staffs/3`,
     addStaff: `${BASE_URL}/addStaffs/3`,
-    specializations : `${BASE_URL}/specializations`
+    specializations : `${BASE_URL}/specializations`,
+    getStaff : `${BASE_URL}/staff/3`, // (/staff/:userid/:staffid) 
+    editStaff : `${BASE_URL}/updateStaff/3` //staffs/:userId
 }
 
 export default Api;
