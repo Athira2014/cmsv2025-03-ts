@@ -4,15 +4,15 @@ import { Specialization } from "./Specialization";
 import { Staff } from "./Staff";
 
 export interface Doctor{
-    docId : number,
+    docId ?: number,
     staff ?: Staff,
     staffId : number,
     specialization ?: Specialization,
     specializationId : number,
     fee : number,
     licenceNo : string,
-    createdDate : string,
-    appintments : Appointment[],
-    doctorsAvailabilities : DoctorsAvailability[],
-    isActive : boolean
+    createdDate?: string,
+    appintments?: Appointment[],
+    doctorsAvailabilities?: DoctorsAvailability[],
+    isActive?: boolean
 }

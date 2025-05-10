@@ -1,9 +1,9 @@
 import axios from "axios";
 import React, { useCallback, useEffect, useState } from "react";
-import Api from "../api/Api";
-import { Role } from "../model/Role";
+import { Role } from "../../models/Role";
 import { Button } from "react-bootstrap";
 import AddRole from "./AddRole";
+import apiService from "../../api/apiService";
 
 const RolesList = () => {
 
@@ -17,21 +17,22 @@ const RolesList = () => {
     const [isLoading, setIsLoading] = useState(true)
 
     // Memorized function to fetch roles from API
-    const fetchRoles = useCallback(async () => {
+    const fetchRoles = async () => {
         try {
             setIsLoading(true)
-            const response = await axios.get<Role[]>(Api.roles)
+            const response = await apiService.roles()
+            setRoles(response.data.data)
             setError(null)
         } catch (error) {
             setError("Error occured while fetching roles.")
         } finally {
             setIsLoading(false)
         }
-    }, [])
+    }
 
     // Effect hook to fetch employees when component mounts
     useEffect(() => {
-        fetchRoles()
+        fetchRoles();
     }, [])
 
     // implement edit and disable logic
@@ -62,8 +63,8 @@ const RolesList = () => {
                                     <td>{role.role}</td>
                                     <td>{role.responsibility}</td>
                                     <td>
-                                        <Button variant="secondary" type="submit" onClick={updateOrDisableRole(role)}>Edit</Button>
-                                        <Button variant="secondary" type="submit" onClick={updateOrDisableRole(role)}>Disable</Button>
+                                        {/* <Button variant="secondary" type="submit" onClick={updateOrDisableRole(role)}>Edit</Button>
+                                        <Button variant="secondary" type="submit" onClick={updateOrDisableRole(role)}>Disable</Button> */}
                                     </td>
                                 </tr>
                             ))}

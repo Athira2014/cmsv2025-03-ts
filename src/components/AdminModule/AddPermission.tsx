@@ -1,10 +1,10 @@
 import axios from "axios";
 import React, { FormEvent, useState } from "react";
-import Api from "../api/Api";
 import { useNavigate } from "react-router-dom";
 import { Form } from "react-bootstrap";
 import { Button } from "react-bootstrap";
-import { ValidationErrors } from "../model/ValidationErrors";
+import { ValidationErrors } from "../../models/ValidationErrors";
+import apiService from "../../api/apiService";
 
 const AddPermission: React.FC = () => {
 
@@ -30,12 +30,14 @@ const AddPermission: React.FC = () => {
     const handleSubmit = async (e: FormEvent) => {
         e.preventDefault();
 
-        if (!validateForm) return;
+        if (!validateForm()) return;
 
         try {
-            const response = await axios.post(Api.addPermission, permissionObj)
+            //const response = await axios.post(Api.addPermission, permissionObj)
+            const response = await apiService.addPermission(permissionObj)
+
             if (response.status === 200 || response.status === 201) {
-                navigate(`${Api.permissionList}`)
+                navigate('/admin/permissions')
             }
             setError(null)
         } catch (error) {

@@ -1,13 +1,13 @@
 import React, { FormEvent, useState } from "react";
-import { BrowserRouter as Router, Routes, Route, useLocation, useNavigate } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route, useLocation, useNavigate, Link } from "react-router-dom";
 // Correct import order:
 // import "bootstrap/dist/css/bootstrap.min.css";
 import { Form } from 'react-bootstrap';
-import Api from "../api/Api";
 import axios from "axios";
 import Button from "react-bootstrap/Button";
 // Custom header component
 import Container from "react-bootstrap/Container";
+import apiService from "../../api/apiService";
 
 interface ValidationErrors {
     [key: string]: string;
@@ -65,7 +65,7 @@ const AddPatient: React.FC = () => {
         const errors: ValidationErrors = {};
 
         if (!patient.firstName.trim()) errors.firstName = "First Name is required."
-        if (!patient.lastName.trim()) errors.lastNmae = "Last Name is required."
+        if (!patient.lastName.trim()) errors.lastName = "Last Name is required."
         if (!patient.dob.trim()) errors.dob = "Date of birth is required."
         if (!patient.sex.trim()) errors.sex = "choose an option for sex declaration."
         if (!patient.phone) {
@@ -89,11 +89,11 @@ const AddPatient: React.FC = () => {
 
     const handleSubmit = async (e: FormEvent) => {
         e.preventDefault();
-        if (!validateForm) return;
+        if (!validateForm()) return;
 
         try {
-            const response = await axios.post(Api.addPatient, patient);
-            console.log(response);
+            //const response = await axios.post(Api.addPatient, patient);
+            const response = await apiService.addPatient(1, patient); // pass userId
             if (response.status === 200 || response.status === 201) {
                 navigate("/");
             }
@@ -103,7 +103,7 @@ const AddPatient: React.FC = () => {
         }
     }
 
-    const handleInputChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value, type } = e.target;
 
         setPatient((prev) => ({
@@ -115,7 +115,7 @@ const AddPatient: React.FC = () => {
             ...prev,
             [name]: "",
         }));
-    }
+    };
 
 
     const handleSelectChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
@@ -136,6 +136,12 @@ const AddPatient: React.FC = () => {
         <div className="container-fluid mt-5">
             <div className="card shadow p-4">
                 <Container>
+                    <div className="d-flex justify-content-between align-items-center mb-4">
+                        <h1>Add Patient</h1>
+                        <Link to="/${Api.patientList}" className="btn btn-secondary">
+                            <i className="fas fa-arrow-right"></i> Patient List
+                        </Link>
+                    </div>
                     <Form onSubmit={handleSubmit}>
                         <Form.Group className="mb-3">
                             <Form.Label htmlFor="firstName">First Name</Form.Label>
@@ -164,7 +170,7 @@ const AddPatient: React.FC = () => {
                                 isInvalid={!!validationErrors.lastName}
                                 placeholder="Enter Last Name"
                             />
-                            <Form.Control.Feedback>
+                            <Form.Control.Feedback type="invalid">
                                 {validationErrors.lastName}
                             </Form.Control.Feedback>
                         </Form.Group>
@@ -179,7 +185,7 @@ const AddPatient: React.FC = () => {
                                 isInvalid={!!validationErrors.dob}
                                 placeholder="Enter D.O.B"
                             />
-                            <Form.Control.Feedback>
+                            <Form.Control.Feedback type="invalid">
                                 {validationErrors.dob}
                             </Form.Control.Feedback>
                         </Form.Group>
@@ -197,7 +203,7 @@ const AddPatient: React.FC = () => {
                                 <option value={SexSelection.FEMALE}>Female</option>
                                 <option value={SexSelection.MALE}>Male</option>
                             </Form.Control>
-                            <Form.Control.Feedback>
+                            <Form.Control.Feedback type="invalid">
                                 {validationErrors.sex}
                             </Form.Control.Feedback>
                         </Form.Group>
@@ -212,7 +218,7 @@ const AddPatient: React.FC = () => {
                                 isInvalid={!!validationErrors.phone}
                                 placeholder="Enter Phone Number"
                             />
-                            <Form.Control.Feedback>
+                            <Form.Control.Feedback type="invalid">
                                 {validationErrors.phone}
                             </Form.Control.Feedback>
                         </Form.Group>
@@ -227,7 +233,7 @@ const AddPatient: React.FC = () => {
                                 isInvalid={!!validationErrors.email}
                                 placeholder="Enter Email"
                             />
-                            <Form.Control.Feedback>
+                            <Form.Control.Feedback type="invalid">
                                 {validationErrors.email}
                             </Form.Control.Feedback>
                         </Form.Group>
@@ -242,7 +248,7 @@ const AddPatient: React.FC = () => {
                                 isInvalid={!!validationErrors.address}
                                 placeholder="Enter Address"
                             />
-                            <Form.Control.Feedback>
+                            <Form.Control.Feedback type="invalid">
                                 {validationErrors.address}
                             </Form.Control.Feedback>
                         </Form.Group>
@@ -262,7 +268,7 @@ const AddPatient: React.FC = () => {
                                 <option value={MembershipStatusSelection.PENDING}>Pending</option>
                                 <option value={MembershipStatusSelection.TERMINATED}>Terminated</option>
                             </Form.Control>
-                            <Form.Control.Feedback>
+                            <Form.Control.Feedback type="invalid">
                                 {validationErrors.membershipStatus}
                             </Form.Control.Feedback>
                         </Form.Group>
@@ -277,7 +283,7 @@ const AddPatient: React.FC = () => {
                                 isInvalid={!!validationErrors.alternatePhone}
                                 placeholder="Enter Alternate Phone"
                             />
-                            <Form.Control.Feedback>
+                            <Form.Control.Feedback type="invalid">
                                 {validationErrors.alternatePhone}
                             </Form.Control.Feedback>
                         </Form.Group>

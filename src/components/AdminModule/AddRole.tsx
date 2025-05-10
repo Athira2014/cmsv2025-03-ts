@@ -1,12 +1,11 @@
 import React, { useState } from "react";
-import { Role } from "../model/Role";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
-import Api from "../api/Api";
 import Container from "react-bootstrap/Container";
 import { Form } from "react-bootstrap";
-import { ValidationErrors } from "../model/ValidationErrors";
+import { ValidationErrors } from "../../models/ValidationErrors";
 import Button from "react-bootstrap/Button";
+import apiService from "../../api/apiService";
+import RolesList from "./RolesList";
 
 const AddRole: React.FC = () => {
 
@@ -20,6 +19,9 @@ const AddRole: React.FC = () => {
 
     // State for general error messages
     const [error, setError] = useState<string | null>(null)
+
+    // set success message
+    const [succesMessage, setSuccesMessage] = useState<string | null>(null)
 
     // State for form validation errors
     const [validationErrors, setValidationErrors] = useState<ValidationErrors>({})
@@ -37,18 +39,23 @@ const AddRole: React.FC = () => {
         setValidationErrors(errors)
         return Object.keys(errors).length === 0
     }
+    
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
-        if (!validateForm) return;
+        if (!validateForm()) return;
 
         try {
-            const response = await axios.post(Api.addRole, role)
+            //const response = await api.post(endpoints.addRole, role)
+            const response = await apiService.addRole(role)
+
             if (response.status === 200 || response.status === 201) {
-                navigate(Api.addRole)
+                setSuccesMessage("Role added succesfully!")
+                navigate(`/admin/roles`)
+            
             }
         } catch (error) {
-
+            setError("Error adding role:");
         }
     }
 
@@ -68,6 +75,9 @@ const AddRole: React.FC = () => {
     return (
         <div className="container-fluid mt-5">
             <Container>
+                {succesMessage && <div className="alert alert-success" role="alert">
+                    {succesMessage}
+                </div>}
                 <Form onSubmit={handleSubmit}>
                     <Form.Group>
                         <div className="row g-2 align-items-center">
@@ -80,6 +90,7 @@ const AddRole: React.FC = () => {
                                     name="role"
                                     type="text"
                                     value={role.role}
+                                    onChange={handleInputChange}
                                     isInvalid={!!validationErrors.role}
                                 />
                                 <Form.Control.Feedback type="invalid">
@@ -100,6 +111,7 @@ const AddRole: React.FC = () => {
                                     rows={3}
                                     name="responsibility"
                                     value={role.responsibility}
+                                    onChange={handleInputChange}
                                     isInvalid={!!validationErrors.responsibility}
                                 />
                                 <Form.Control.Feedback type="invalid">

@@ -6,9 +6,9 @@ export interface Role{
     roleId : number,
     role : string,
     responsibility: string,
-    isActive : boolean,
-    createdDate : string,
-    staffList : Staff[],
-    rolesAndPermissions : RolesAndPermissions[],
-    users : User[]
+    isActive?: boolean,
+    createdDate?: string,
+    staffList?: Staff[],
+    rolesAndPermissions?: RolesAndPermissions[],
+    users?: User[]
 }

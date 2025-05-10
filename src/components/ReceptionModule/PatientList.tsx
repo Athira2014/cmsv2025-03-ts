@@ -5,9 +5,8 @@ import axios from 'axios';  // For making HTTP requests
 import { Link } from 'react-router-dom';  // For client-side navigation
 //import { debounce } from 'lodash';  // Utility for debouncing search input
 import ReactPaginate from 'react-paginate';  // Pagination component
-import { Patient } from '../model/Patient';
-import Api from '../api/Api';
-import { ApiResponse } from '../api/ApiResponse';
+import { Patient } from '../../models/Patient';
+import apiService from '../../api/apiService';
 
 const PatientList: React.FC = () => {
     //State Maintenance
@@ -24,7 +23,9 @@ const PatientList: React.FC = () => {
     const fetchPatients = (async () => {
         try {
             setIsLoading(true);
-            const response = await axios.get<ApiResponse<Patient[]>>(Api.patientList);
+            // const response = await axios.get<ApiResponse<Patient[]>>(Api.patientList);
+            const response = await apiService.patients();
+
             setPatients(response.data.data)
             setError(null);
         } catch (error) {

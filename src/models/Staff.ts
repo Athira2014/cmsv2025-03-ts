@@ -16,6 +16,6 @@ export interface Staff{
     status : string,
     address : string,
     roleId :number,
-    doctor ?: Doctor,
-    staffAttendances : StaffAttendance[]
+    doctor?: Doctor,
+    staffAttendances?: StaffAttendance[]
 }

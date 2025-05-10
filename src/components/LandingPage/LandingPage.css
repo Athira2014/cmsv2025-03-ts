@@ -1,0 +1,6 @@
+.landing-page {
+    background-image: url('../../assets/Clinic_bg.jpg');
+    background-size: cover;
+    background-position: center;
+    height: 100vh;
+}

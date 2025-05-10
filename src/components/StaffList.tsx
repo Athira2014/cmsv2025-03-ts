@@ -1,13 +1,14 @@
 import React, { useCallback, useEffect, useState } from "react";
-import { Staff } from "../model/Staff";
+import { Staff } from "../models/Staff";
 import axios from "axios";
-import Api from "../api/Api";
 import Container from "react-bootstrap/Container";
-import { ApiResponse } from "../api/ApiResponse";
 import Button from "react-bootstrap/Button";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
+import apiService from "../api/apiService";
 
 const StaffList: React.FC = () => {
+
+      const { userId } = useParams();
 
     const [staffs, setStaffs] = useState<Staff[]>([])
 
@@ -20,7 +21,10 @@ const StaffList: React.FC = () => {
     const fetchStaff = useCallback(async () => {
         try {
             setIsLoading(true)
-            const response = await axios.get<ApiResponse<Staff[]>>(Api.staffs)
+            console.log("userId:" +userId)
+            // const response = await axios.get<ApiResponse<Staff[]>>(Api.staffs)
+            const response = await apiService.staffs(Number(userId)) //userId
+
             setStaffs(response.data.data)
             setError(null)
         } catch (error) {
@@ -37,12 +41,16 @@ const StaffList: React.FC = () => {
 
     const handleEdit = (staff: Staff) =>{
         //    navigate(`${Api.getStaff}/${staff.staffId}`);
-        navigate(`/staff/3/${staff.staffId}`)
+       // navigate(`/updateStaff/${userId}/`)
+           navigate(`/updateStaff/${userId}/${staff.staffId}`);
     }
 
     return (
         <div className="container-dashboard">
             <div className="card shadow p-4">
+                <div className="card-header p-2">
+                    <h2>Staff List</h2>
+                </div>
                 <div className="table-responsive">
                     <table className="table table-striped table-hover">
                         <thead className="table-dark">

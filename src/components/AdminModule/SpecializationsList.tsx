@@ -1,9 +1,8 @@
 import React, { useCallback, useEffect, useState } from "react";
-import { Specialization } from "../model/Specialization";
+import { Specialization } from "../../models/Specialization";
 import axios from "axios";
-import Api from "../api/Api";
-import { ApiResponse } from "../api/ApiResponse";
 import AddSpecialization from "./AddSpecialization";
+import apiService from "../../api/apiService";
 
 const SpecializationsList: React.FC = () => {
 
@@ -18,7 +17,7 @@ const SpecializationsList: React.FC = () => {
 
         try {
             setIsLoading(true)
-            const response = await axios.get<ApiResponse<Specialization[]>>(Api.specializations)
+            const response = await apiService.specializations()
             setSpecializations(response.data.data)
             setError(null)
         } catch (error) {

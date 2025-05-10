@@ -2,10 +2,12 @@ import axios from "axios";
 import React, { FormEvent, useState } from "react";
 import { ChangeEvent } from "react";
 import { Form } from 'react-bootstrap';
-import Api from "../api/Api";
 import { BrowserRouter as Router, Routes, Route, useLocation, useNavigate } from "react-router-dom";
 import Button from "react-bootstrap/Button";
-import { ValidationErrors } from "../model/ValidationErrors";
+import { ValidationErrors } from "../../models/ValidationErrors";
+import endpoints from "../../api/endpoints";
+import api from "../../api/api";
+import apiService from "../../api/apiService";
 
 const AddSpecialization: React.FC = () => {
 
@@ -37,12 +39,15 @@ const AddSpecialization: React.FC = () => {
     const handleSubmit = (async (e: FormEvent) => {
 
         e.preventDefault();
-        if (!validateForm) return;
+        if (!validateForm()) return;
 
         try {
-            const response = await axios.post(Api.addSpecializations, specialization)
+            //const response = await axios.post(Api.addSpecializations, specialization)
+            //const response = await api.post(endpoints.addSpecializations, specialization)
+            const response = await apiService.addSpecializations(specialization)
+
             if (response.status === 200 || response.status === 201) {
-                navigate(Api.addSpecializations)
+                navigate(`/specializations`)
             }
             setError(null);
         } catch (error) {

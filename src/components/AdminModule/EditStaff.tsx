@@ -1,77 +1,64 @@
-import React, { ChangeEvent, FormEvent, useCallback, useEffect, useState } from "react";
-import { Staff } from "../model/Staff";
-import { ValidationErrors } from "../model/ValidationErrors";
-import { Role } from "../model/Role";
-import { useNavigate } from "react-router-dom";
-import { ApiResponse } from "../api/ApiResponse";
-import Api from "../api/Api";
-import axios from "axios";
-import { set, toUpper } from "lodash";
+import React, { useCallback, useState } from "react";
 import Container from "react-bootstrap/Container";
-import { Form } from "react-bootstrap";
+import Form from "react-bootstrap/Form";
 import Button from "react-bootstrap/Button";
-import { Specialization } from "../model/Specialization";
+import { Staff } from "../../models/Staff";
+import { Role } from "../../models/Role";
+import { Link, useNavigate, useParams } from "react-router-dom";
+import { ValidationErrors } from "../../models/ValidationErrors";
+import { Specialization } from "../../models/Specialization";
+import { useEffect } from "react";
+import { ChangeEvent } from "react";
+import { toUpper } from "lodash";
+import { Doctor } from "../../models/Doctor";
+import apiService from "../../api/apiService";
 
+const EditStaff: React.FC = () => {
 
-const AddStaff: React.FC = () => {
+    const { staffId } = useParams();
 
-    const [staff, setStaff] = useState({
-        staffId: 0,
-        firstName: "",
-        lastName: "",
-        roleId: 0,
-        dob: "",
-        phone: "",
-        email: "",
-        joiningDate: "",
-        tillDate: "",
-        salary: 0,
-        status: "",
-        address: ""
-    })
+    const [staff, setStaff] = useState<Staff>()
 
-    const [doctor, setdoctor] = useState({
-        staffId: 0,
-        specializationId: 0,
-        fee: 0,
-        licenceNo: ""
-    })
-
-    // state for storing error
-    const [error, setError] = useState<string | null>(null)
-
-    //state for validationErrors
-    const [validationErrors, setValidationErrors] = useState<ValidationErrors>({})
+    const [doctor, setDoctor] = useState<Doctor>()
 
     // State for storing roles
     const [roles, setRoles] = useState<Role[]>([])
 
-    // get Doctor's role id
-    const Doctor_Role_Id = roles.find(role => toUpper(role.role) === "DOCTOR")?.roleId
+    const [specializations, setSpecializations] = useState<Specialization[]>([])
 
-    // Hook for programmatic navigation
-    const navigate = useNavigate()
+    // const [selectedRoleId, setSelectedRoleId] = useState<number | undefined>(undefined);
 
+    const navigate = useNavigate();
+
+    const [error, setError] = useState<string | null>(null)
+
+    const [validationErrors, setValidationErrors] = useState<ValidationErrors>({})
+
+    const [isLoading, setIsLoading] = useState(false)
     //state to show doctor creation window
     const [showDoctorForm, setShowDoctorForm] = useState(false)
 
-    const [specializations, setSpecializations] = useState<Specialization[]>([])
+    const [docRole, setDocRole] = useState<number | null>(null);
 
-    const [isLoading, setIsLoading] = useState(false)
+    const today = new Date().toISOString().split("T")[0];
+
+    const userId = localStorage.getItem("userId")
 
     //fetch roles for the ddl
-    const fetchRole = (async () => {
+    const fetchRoles = useCallback(async () => {
         try {
-            const response = await axios.get<ApiResponse<Role[]>>(Api.roles)
+            // const response = await axios.get<ApiResponse<Role[]>>(Api.roles)
+            const response = await apiService.roles()
+
             setRoles(response.data.data)
             setError(null)
         } catch (error) {
             setError("Error occure while fetching roles")
         }
-    })
+    }, [])
 
     useEffect(() => {
-        fetchRole();
+        fetchRoles();
     }, [])
 
 
@@ -79,8 +66,11 @@ const AddStaff: React.FC = () => {
 
         try {
             setIsLoading(true)
-            const response = await axios.get<ApiResponse<Specialization[]>>(Api.specializations)
+            // const response = await axios.get<ApiResponse<Specialization[]>>(Api.specializations)
+            const response = await apiService.specializations()
+
             setSpecializations(response.data.data)
+            console.log("specializations :" + specializations)
             setError(null)
         } catch (error) {
             setError("Error occure while fetching Specializations.")
@@ -89,10 +79,57 @@ const AddStaff: React.FC = () => {
         }
     }, [])
 
-
     useEffect(() => {
         fetchSpecializations();
     }, [])
+
+
+    //fetch Staff
+    const fetchStaff = async () => {
+        try {
+            if (staffId !== undefined) {
+                setIsLoading(true)
+                //const response = await axios.get<ApiResponse<Staff>>(Api.getStaff + `/${staffId}`)
+                const response = await apiService.getStaff(Number(userId), parseInt(staffId))
+
+                const staffData = response.data.data
+                setStaff(staffData)
+                setError(null)
+            }
+
+        } catch (error) {
+            setError("Error occured while fetching staffs.")
+        } finally {
+            setIsLoading(false)
+        }
+
+    }
+    useEffect(() => {
+        fetchStaff();
+    }, [])
+
+
+    useEffect(() => {
+        if (roles.length > 0 && staff?.role?.roleId) {
+            const doctorRoleId = roles.find(role => toUpper(role.role.trim()) === "DOCTOR")?.roleId;
+            if (doctorRoleId) {
+                if (staff.role.roleId === doctorRoleId) {
+                    setShowDoctorForm(true);
+                    setDocRole(doctorRoleId)
+                    if (staff.doctor) {
+                        setDoctor(staff.doctor);
+                    }
+                } else {
+                    setShowDoctorForm(false);
+                }
+            }
+        }
+    }, [roles, staff]);
+
+
+    if (!staff) {
+        return <div>Loading staff...</div>;
+    }
 
     const validateForm = (): boolean => {
         const errors: ValidationErrors = {}
@@ -102,65 +139,72 @@ const AddStaff: React.FC = () => {
         if (!staff.dob.trim()) errors.lastName = "Dob is required."
         if (!staff.phone.trim()) {
             errors.phone = "Phone is required."
-        } else if (!/^\d{3}-\d{3}-\d{4}$/.test(staff.phone)) {
-            errors.phone = "Phone Number must be 10 digits."
+        } else if (!/^\d{10}$/.test(staff.phone)) {
+            errors.phone = "Phone Number must be exactly 10 digits.";
         }
+
         if (!staff.email) {
             errors.email = "Email is required."
         } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(staff.email)) {
             errors.email = "Enter a valid Email."
         } if (!staff.joiningDate.trim()) errors.joiningDate = "Joining Date is required."
-        if (!staff.tillDate.trim()) errors.tillDate = "Till Date is required."
         if (staff.salary <= 0) errors.salary = "Salary should not be zero."
         if (!staff.status.trim()) errors.status = "status is required."
         if (!staff.address.trim()) errors.address = "Address is required."
-        if (!staff.roleId) errors.roleId = "Role is required.";
+        if (!staff.role?.roleId) errors.roleId = "Role is required.";
 
         setValidationErrors(errors)
         return Object.keys(errors).length === 0
     }
-    const handleSubmit = async (e: FormEvent) => {
+
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        if (!validateForm) return;
+        if (!validateForm()) return;
 
         try {
-            console.log("staff :"+staff)
-            const response = await axios.post(Api.addStaff, staff)
+            console.log("Payload being sent:", staff);
+
+            // const response = await axios.put(Api.editStaff, staff)
+            const response = await apiService.updateStaff(Number(userId), Number(staffId), staff) // userId
+
             if (response.status === 200 || response.status === 201) {
                 setStaff(response.data.data)
                 setError(null)
-                const newStaffCreated = response.data.data
-                console.log(newStaffCreated)
+                const updatedStaff = response.data.data
+                console.log(updatedStaff)
                 //const staffCreated = response.data
                 //Update setShowDoctorForm(true) to get the  staff ID:
-                if (staff.roleId === Doctor_Role_Id) {
+                if (staff.roleId && staff.roleId === docRole && doctor) {
                     try {
-                        doctor.staffId = newStaffCreated.staffId
-                        const response = await axios.post(Api.addDoctor, doctor);
+                        doctor!.staffId = updatedStaff.staffId
+                        // const response = await axios.put(Api.upadteDoctor, doctor);
+                        const response = await apiService.upadteDoctor(doctor);
+
                         if (response.status === 200 || response.status === 201) {
-                            navigate(`/${Api.staffs}`)
+                            navigate(`/staffs/${userId}`)
                         }
                     } catch (error) {
                         setError("Error occurred while adding doctor.");
                     }
                 } else {
-                    navigate(`/${Api.staffs}`)
+                    navigate(`/staffs/${userId}`)
                 }
             }
         } catch (error) {
-            setError("Error occured while adding staff.")
+            setError("Error occured while updating staff.")
         }
     }
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const { name, value, type } = e.target;
+        const { name, value, type, checked } = e.target;
+        const val = type === "checkbox" ? (checked ? "TRUE" : "FALSE") : value;
 
-        setStaff((prev) => ({
+        setStaff((prev: any) => ({
             ...prev,
             [name]: type === "number" ? Number(value) : value
         }));
 
-        setdoctor((prev) => ({
+        setDoctor((prev: any) => ({
             ...prev,
             [name]: type === "number" ? Number(value) : value
         }));
@@ -174,21 +218,22 @@ const AddStaff: React.FC = () => {
     const handleRoleSelectChange = (e: ChangeEvent<HTMLSelectElement>) => {
 
         const { name, value, type } = e.target;
-        const roleIdSelected = Number(value)
+        const selectedRoleId = Number(e.target.value);
+        const selectedRole = roles.find(role => role.roleId === selectedRoleId);
 
-        setStaff((prev) => ({
+        setStaff((prev: any) => ({
             ...prev,
-            [name]: Number(value)
+            [name]: selectedRole
         }));
         setValidationErrors((prev) => ({
             ...prev,
             [name]: ""
         }));
-
-        if (roleIdSelected !== 0 && roleIdSelected === Doctor_Role_Id) {
+        // Toggle doctor form visibility
+        if (selectedRole && toUpper(selectedRole.role) === "DOCTOR") {
             setShowDoctorForm(true);
         } else {
-            setShowDoctorForm(false)
+            setShowDoctorForm(false);
         }
     }
 
@@ -196,7 +241,7 @@ const AddStaff: React.FC = () => {
 
         const { name, value, type } = e.target;
 
-        setdoctor((prev) => ({
+        setDoctor((prev: any) => ({
             ...prev,
             [name]: Number(value)
         }));
@@ -207,9 +252,17 @@ const AddStaff: React.FC = () => {
     }
 
     return (
+
         <div className="container-fluid mt-4">
             <div className="card shadow p-4">
                 <Container>
+
+                    <div className="d-flex justify-content-between align-items-center mb-4">
+                        <h1>Edit Staff</h1>
+                        <Link to={`/staffs/${userId}`} className="btn btn-secondary">
+                            <i className="fas fa-arrow-right"></i> Staff List
+                        </Link>
+                    </div>
                     <Form onSubmit={handleSubmit}>
                         <Form.Group>
                             <Form.Label htmlFor="firstName">First Name</Form.Label>
@@ -217,7 +270,7 @@ const AddStaff: React.FC = () => {
                                 id="firstName"
                                 name="firstName"
                                 type="text"
-                                value={staff.firstName}
+                                value={staff.firstName || ""}
                                 onChange={handleInputChange}
                                 isInvalid={!!validationErrors.firstName}
                             />
@@ -231,7 +284,7 @@ const AddStaff: React.FC = () => {
                                 id="lastName"
                                 name="lastName"
                                 type="text"
-                                value={staff.lastName}
+                                value={staff.lastName || ""}
                                 onChange={handleInputChange}
                                 isInvalid={!!validationErrors.lastName}
                             />
@@ -245,7 +298,8 @@ const AddStaff: React.FC = () => {
                                 id="dob"
                                 name="dob"
                                 type="date"
-                                value={staff.dob}
+                                max={today}
+                                value={staff!.dob || ""}
                                 onChange={handleInputChange}
                                 isInvalid={!!validationErrors.dob}
                             />
@@ -259,7 +313,7 @@ const AddStaff: React.FC = () => {
                                 id="phone"
                                 name="phone"
                                 type="text"
-                                value={staff.phone}
+                                value={staff!.phone || ""}
                                 onChange={handleInputChange}
                                 isInvalid={!!validationErrors.phone}
                             />
@@ -273,7 +327,7 @@ const AddStaff: React.FC = () => {
                                 id="email"
                                 name="email"
                                 type="text"
-                                value={staff.email}
+                                value={staff!.email || ""}
                                 onChange={handleInputChange}
                                 isInvalid={!!validationErrors.email}
                             />
@@ -310,7 +364,7 @@ const AddStaff: React.FC = () => {
                                         id="licenceNo"
                                         name="licenceNo"
                                         type="text"
-                                        value={doctor.licenceNo}
+                                        value={doctor!.licenceNo || ""}
                                         onChange={handleInputChange}
                                         isInvalid={!!validationErrors.licenceNo}
                                     />
@@ -324,7 +378,7 @@ const AddStaff: React.FC = () => {
                                         id="specializationId"
                                         name="specializationId"
                                         as="select"
-                                        value={doctor.specializationId}
+                                        value={doctor!.specializationId || ""}
                                         onChange={handleSpecilalizationSelect}
                                         isInvalid={!!validationErrors.specializationId}
                                     >
@@ -334,7 +388,7 @@ const AddStaff: React.FC = () => {
                                                 {specialization.specializationName}
                                             </option>
                                         ))}
-                                    </Form.Select> 
+                                    </Form.Select>
                                     <Form.Control.Feedback type="invalid">
                                         {validationErrors.specializationId}
                                     </Form.Control.Feedback>
@@ -345,7 +399,7 @@ const AddStaff: React.FC = () => {
                                         id="fee"
                                         name="fee"
                                         type="number"
-                                        value={doctor.fee}
+                                        value={doctor!.fee || ""}
                                         onChange={handleInputChange}
                                         isInvalid={!!validationErrors.fee}
                                     />
@@ -363,7 +417,7 @@ const AddStaff: React.FC = () => {
                                 id="joiningDate"
                                 name="joiningDate"
                                 type="date"
-                                value={staff.joiningDate}
+                                value={staff!.joiningDate || ""}
                                 onChange={handleInputChange}
                                 isInvalid={!!validationErrors.joiningDate}
                             />
@@ -371,41 +425,39 @@ const AddStaff: React.FC = () => {
                                 {validationErrors.joiningDate}
                             </Form.Control.Feedback>
                         </Form.Group>
-                        {/* <Form.Group>
+                        <Form.Group>
                             <Form.Label htmlFor="joiningDate">Till Date</Form.Label>
                             <Form.Control
                                 id="tillDate"
                                 name="tillDate"
                                 type="date"
-                                value={staff.tillDate}
+                                min={today}
+                                value={staff!.tillDate || ""}
                                 onChange={handleInputChange}
                                 isInvalid={!!validationErrors.tillDate}
                             />
                             <Form.Control.Feedback type="invalid">
                                 {validationErrors.tillDate}
                             </Form.Control.Feedback>
-                        </Form.Group> */}
-                        {/* <Form.Group> set active = true while adding a staff
+                        </Form.Group>
+                        <Form.Group>
                             <Form.Label htmlFor="status">Status</Form.Label>
-                            <Form.Control
+                            <Form.Check.Input
                                 id="status"
                                 name="status"
                                 type="checkbox"
-                                value={staff.status}
+                                value={staff!.status || ""}
+                                checked={toUpper(staff.status) === "ACTIVE" ? true : false}
                                 onChange={handleInputChange}
-                                isInvalid={!!validationErrors.status}
                             />
-                            <Form.Control.Feedback type="invalid">
-                                {validationErrors.status}
-                            </Form.Control.Feedback>
-                        </Form.Group> */}
+                        </Form.Group>
                         <Form.Group>
                             <Form.Label htmlFor="salary">Salary</Form.Label>
                             <Form.Control
                                 id="salary"
                                 name="salary"
                                 type="number"
-                                value={staff.salary}
+                                value={staff!.salary || 0}
                                 onChange={handleInputChange}
                                 isInvalid={!!validationErrors.salary}
                             />
@@ -419,7 +471,7 @@ const AddStaff: React.FC = () => {
                                 id="address"
                                 name="address"
                                 type="text"
-                                value={staff.address}
+                                value={staff!.address || ""}
                                 onChange={handleInputChange}
                                 isInvalid={!!validationErrors.address}
                             />
@@ -428,7 +480,7 @@ const AddStaff: React.FC = () => {
                             </Form.Control.Feedback>
                         </Form.Group>
                         <Button variant="primary" type="submit" className="mt-4">
-                            Add Staff
+                            Update
                         </Button>
                     </Form>
                 </Container>
@@ -438,4 +490,4 @@ const AddStaff: React.FC = () => {
     )
 }
 
-export default AddStaff;
+export default EditStaff;

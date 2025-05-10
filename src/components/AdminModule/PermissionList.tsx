@@ -1,11 +1,10 @@
 import React, { useCallback, useEffect, useState } from "react";
-import { Permission } from "../model/Permission";
-import Api from "../api/Api";
+import { Permission } from "../../models/Permission";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { Button } from "react-bootstrap";
+import apiService from "../../api/apiService";
 import AddPermission from "./AddPermission";
-import { ApiResponse } from "../api/ApiResponse";
 
 const PermissionList: React.FC = () => {
 
@@ -24,7 +23,9 @@ const PermissionList: React.FC = () => {
     const fetchPermissions = useCallback(async () => {
         setIsLoading(true);
         try {
-            const response = await axios.get<ApiResponse<Permission[]>>(Api.permissionList);
+            // const response = await axios.get<ApiResponse<Permission[]>>(Api.permissionList);
+            const response = await apiService.permissionList()
+
             setPermissions(response.data.data);
             console.log(response.data.data)
             setError(null); // Clear any previous error

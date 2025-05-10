@@ -13,6 +13,6 @@ export interface Patient{
     membershipStatus : string,
     alternatePhone : string,
     //membershipFromDate : string,
-    appointments:Appointment[],
-    consultationNotes : ConsultationNote[];
+    appointments?:Appointment[],
+    consultationNotes?: ConsultationNote[];
 }

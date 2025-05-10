@@ -1,16 +1,17 @@
 import React, { ChangeEvent, FormEvent, useEffect, useState } from "react";
-import { ValidationErrors } from "../model/ValidationErrors";
-import { Specialization } from "../model/Specialization";
+import { ValidationErrors } from "../../models/ValidationErrors";
+import { Specialization } from "../../models/Specialization";
 import { useCallback } from "react";
 import axios from "axios";
-import { ApiResponse } from "../api/ApiResponse";
-import Api from "../api/Api";
+import { apiResponse } from "../../api/apiResponse";
+import Api from "../../api/api";
 import Container from "react-bootstrap/esm/Container";
 import { Form } from "react-bootstrap";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import Button from "react-bootstrap/Button";
+import apiService from "../../api/apiService";
 
-const AddDoctor: React.FC<{staffId : number}> = ({staffId}) => {
+const AddDoctor: React.FC<{ staffId: number }> = ({ staffId }) => {
 
     const [doctor, setDoctor] = useState({
         docId: 0,
@@ -34,7 +35,8 @@ const AddDoctor: React.FC<{staffId : number}> = ({staffId}) => {
 
         try {
             setIsLoading(true)
-            const response = await axios.get<ApiResponse<Specialization[]>>(Api.specializations)
+            //const response = await axios.get<ApiResponse<Specialization[]>>(Api.specializations)
+            const response = await apiService.specializations();
             setSpecializations(response.data.data)
             setError(null)
         } catch (error) {
@@ -49,7 +51,7 @@ const AddDoctor: React.FC<{staffId : number}> = ({staffId}) => {
         fetchSpecializations();
     }, [])
 
-    const validateForm = (e: FormEvent): boolean => {
+    const validateForm = (): boolean => {
         const errors: ValidationErrors = {};
         if (!doctor.specializationId) errors.specializationId = "Specialization is required.";
         if (doctor.fee <= 0) errors.fee = "Fee should be higher than 0."
@@ -61,19 +63,20 @@ const AddDoctor: React.FC<{staffId : number}> = ({staffId}) => {
 
     const handleSubmit = async (e: FormEvent) => {
         e.preventDefault();
-    
-        if (!validateForm(e)) return;
-    
+
+        if (!validateForm()) return;
+
         try {
-            const response = await axios.post(Api.addDoctor, doctor);
+            //const response = await axios.post(Api.addDoctor, doctor);
+            const response = await apiService.addDoctor(doctor)
             if (response.status === 200 || response.status === 201) {
-                navigate(Api.addStaff)
+                navigate('/addStaff')
             }
         } catch (error) {
             setError("Error occurred while adding doctor.");
         }
     };
-    
+
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value, type } = e.target;
@@ -130,7 +133,7 @@ const AddDoctor: React.FC<{staffId : number}> = ({staffId}) => {
                             name="specializationId"
                             as="select"
                             value={doctor.specializationId}
-                            onChange ={handleSelectChange}
+                            onChange={handleSelectChange}
                             isInvalid={!!validationErrors.specializationId}
                         >
                             <option value="">Select Specialization</option>
