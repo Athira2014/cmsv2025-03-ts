@@ -5,6 +5,6 @@ export interface LabTestCategory{
     category : string,
     isActive : boolean,
     createdDate : string,
-    labTests : LabTest[],
+    labTests?: LabTest[],
     
 }

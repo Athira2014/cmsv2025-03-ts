@@ -1,7 +1,7 @@
 export interface Qualification{
-    qId : number,
+    qId ?: number,
     qualification : string,
-    qualifiedOn : string,
+   // qualifiedOn : string,
     createdDate : string,
-    isActive : boolean
+    active : boolean
 }

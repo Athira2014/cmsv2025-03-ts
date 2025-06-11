@@ -14,17 +14,19 @@ const Login: React.FC<LoginProps> = ({ onLoginSuccess }) => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
-    const [user, setUser] = useState<User>()
+    //const [user, setUser] = useState<User>()
     const navigate = useNavigate();
-
+    const [loading, setLoading] = useState(false);
 
     const handleSubmit = async (e: FormEvent) => {
         e.preventDefault();
 
         if (!email.trim() || !password.trim()) {
-            setError("Email and password is required!")
+            setError("Email and password are required!");
+            return;
         }
 
+        setLoading(true);
         try {
             const response = await apiService.login({ email, password });
             const user = response.data.data;
@@ -49,9 +51,9 @@ const Login: React.FC<LoginProps> = ({ onLoginSuccess }) => {
                 } else if (roleIdStr === '2') {
                     navigate('/manager');
                 } else if (roleIdStr === '3') {
-                    navigate('/doctor');
+                    navigate('/doctorDash');
                 } else if (roleIdStr === '4') {
-                    navigate('/receptionist');
+                    navigate('/reception');
                 } else {
                     navigate('/unauthorized');
                 }
@@ -59,14 +61,22 @@ const Login: React.FC<LoginProps> = ({ onLoginSuccess }) => {
                 setError('Invalid Credentials.')
             }
 
-        } catch (error) {
-            setError('Invalid Credentials.')
+        } catch (error: any) {
+            if (axios.isAxiosError(error) && error.response?.data) {
+                setError(error.response.data);
+            } else {
+                setError('Invalid Credentials.');
+            }
+        }
+        finally {
+            setLoading(false);
         }
 
     }
 
     return (
         <div className="container mt-5">
+            {error && <div className="alert alert-danger mt-2">{error}</div>}
             <div className="row justify-content-center">
                 <div className="col-md-4">
                     <div className="card p-4">
@@ -75,7 +85,6 @@ const Login: React.FC<LoginProps> = ({ onLoginSuccess }) => {
                             <Form.Group>
                                 <Form.Label>Email</Form.Label>
                                 <Form.Control
-
                                     name="email"
                                     type="text"
                                     value={email}
@@ -87,13 +96,17 @@ const Login: React.FC<LoginProps> = ({ onLoginSuccess }) => {
                                 <Form.Control
 
                                     name="password"
-                                    type="text"
+                                    type="password"
                                     value={password}
                                     onChange={(e) => setPassword(e.target.value)}
                                 />
                             </Form.Group>
                             <button className="btn btn-primary w-100" type="submit">
                                 Login
+                            </button>
+                            <div className="text-center my-3"><strong>OR</strong></div>
+                            <button className="btn btn-secondary w-100" type="button" onClick={() => navigate('/signup')}>
+                                SignUp
                             </button>
                         </Form>
                     </div>

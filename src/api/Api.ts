@@ -12,9 +12,15 @@ const BASE_URL = "http://localhost:9092/api";
 //Admin
 // {
 //     "password": "rio@123",  
-//     "email": "rio.gen@example.com",
+//     "email": "riogen@gmail.com",
 //     "userName":"rio_gen"
 //   }
+///Doctor
+// {
+//     "userName": "andrew_j",
+//     "password": "andrew@2024",
+// 	"email": "andrew@gmail.com"
+// }
 
 // const Api = {
 //     login: `${BASE_URL}/login`,
@@ -41,7 +47,7 @@ const api = axios.create({
 });
 
 // Optional: automatically attach token if available
-api.interceptors.request.use((config) => {
+api.interceptors.request.use((config) => { 
     const token =localStorage.getItem('authToken');
     if(token){
         config.headers['authorization'] = token;

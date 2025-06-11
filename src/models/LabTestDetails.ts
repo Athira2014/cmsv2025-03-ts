@@ -8,5 +8,5 @@ export interface LabTestDetails{
     isActive : boolean,
     labTestPrescription ?: LabTestPrescription,
     labPrescId : number,
-    labTestResult : LabTestResult
+    labTestResult ?: LabTestResult
 }

@@ -6,8 +6,8 @@ export interface MedicinePrescription{
     appointment ?: Appointment,
     appointmentId : number,
     medicines : string,
-    dosage : number,
+    dosage : string,
     frequency : string,
     createdDate : string,
-    pharmacyPurchases : PharmacyPurchase[];
+    pharmacyPurchases?: PharmacyPurchase[];
 }

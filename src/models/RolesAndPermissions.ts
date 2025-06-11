@@ -2,7 +2,7 @@ import { Permission } from "./Permission";
 import { Role } from "./Role";
 
 export interface RolesAndPermissions{
-    roleAndPermId : number,
+    roleAndPermId ?: number,
     role ?: Role,
     roleId : number,
     permission ?: Permission,

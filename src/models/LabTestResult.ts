@@ -1,9 +1,9 @@
 import { LabTestDetails } from "./LabTestDetails";
 
 export interface LabTestResult{
-    labTestResId : number,
+    labTestResId ?: number,
     labTestDetails ?: LabTestDetails,
-    labTestDetId : number,
+    labTestDetId ?: number,
     description : string,
     result : number,
     flag : string,

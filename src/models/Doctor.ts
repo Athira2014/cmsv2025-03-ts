@@ -12,7 +12,6 @@ export interface Doctor{
     fee : number,
     licenceNo : string,
     createdDate?: string,
-    appintments?: Appointment[],
-    doctorsAvailabilities?: DoctorsAvailability[],
-    isActive?: boolean
+    isActive?: boolean,
+    name?:string
 }

@@ -4,3 +4,7 @@
     background-position: center;
     height: 100vh;
 }
+h1.message{
+    text-align: center;
+    font-size: 50px;
+}

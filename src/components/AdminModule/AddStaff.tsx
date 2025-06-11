@@ -222,9 +222,9 @@ const AddStaff: React.FC = () => {
                 <Container>
                     <div className="d-flex justify-content-between align-items-center mb-4">
                         <h2>Add Staff</h2>
-                        <Link to="/${Api.staffs}" className="btn btn-secondary">
+                        {/* <Link to="/${Api.staffs}" className="btn btn-secondary">
                             <i className="fas fa-arrow-right"></i> Staff List
-                        </Link>
+                        </Link> */}
                     </div>
                     <Form onSubmit={handleSubmit}>
                         <Form.Group>

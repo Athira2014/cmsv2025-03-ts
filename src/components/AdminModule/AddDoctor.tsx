@@ -2,9 +2,6 @@ import React, { ChangeEvent, FormEvent, useEffect, useState } from "react";
 import { ValidationErrors } from "../../models/ValidationErrors";
 import { Specialization } from "../../models/Specialization";
 import { useCallback } from "react";
-import axios from "axios";
-import { apiResponse } from "../../api/apiResponse";
-import Api from "../../api/api";
 import Container from "react-bootstrap/esm/Container";
 import { Form } from "react-bootstrap";
 import { useNavigate, Link } from "react-router-dom";
@@ -137,7 +134,7 @@ const AddDoctor: React.FC<{ staffId: number }> = ({ staffId }) => {
                             isInvalid={!!validationErrors.specializationId}
                         >
                             <option value="">Select Specialization</option>
-                            {specializations.map(specialization => (
+                            {specializations?.map(specialization => (
                                 <option key={specialization.specializationId} value={specialization.specializationId}>
                                     {specialization.specializationName}
                                 </option>

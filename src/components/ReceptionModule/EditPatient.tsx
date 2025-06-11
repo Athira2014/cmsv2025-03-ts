@@ -1,14 +1,8 @@
-import React, { FormEvent, useState } from "react";
-import { BrowserRouter as Router, Routes, Route, useLocation, useNavigate, Link } from "react-router-dom";
-import { Form } from 'react-bootstrap';
-import Button from "react-bootstrap/Button";
-// Custom header component
-import Container from "react-bootstrap/Container";
+import { FormEvent, useCallback, useEffect, useState } from "react";
+import { ValidationErrors } from "../../models/ValidationErrors";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import apiService from "../../api/apiService";
-
-interface ValidationErrors {
-    [key: string]: string;
-}
+import { Button, Container, Form } from "react-bootstrap";
 
 enum SexSelection {
     MALE = "M",
@@ -22,9 +16,11 @@ enum MembershipStatusSelection {
     TERMINATED = "Terminated"
 }
 
-const AddPatient: React.FC = () => {
+const EditPatient : React.FC = ()=>{
 
     //State management
+
+    const {patientId} = useParams();
 
     // State for patient form data, initialized with default values
     const [patient, setPatient] = useState({
@@ -68,7 +64,7 @@ const AddPatient: React.FC = () => {
         if (!patient.sex.trim()) errors.sex = "choose an option for sex declaration."
         if (!patient.phone) {
             errors.phone = "Phone is required."
-        } else if (!/^\d{3}-\d{3}-\d{4}$/.test(patient.phone)) {
+        } else if (!/^\d{10}$/.test(patient.phone)) {
             errors.phone = "Phone Number must be 10 digits.";
         }
         if (!patient.email) {
@@ -85,6 +81,20 @@ const AddPatient: React.FC = () => {
         return Object.keys(errors).length === 0 // true when no error message.
     };
 
+    const fetchPatient = useCallback(async() => {
+
+        try {
+            const response = await apiService.gtPatientById(Number(patientId), Number(userId));
+            setPatient(response.data.data)
+            setError(null)
+        } catch (error) {
+            setError("Error occured while fetching patient by id.")
+        }
+    }, [])
+
+    useEffect(() => {
+        fetchPatient();
+    },[])
     const handleSubmit = async (e: FormEvent) => {
         e.preventDefault();
         if (!validateForm()) return;
@@ -93,7 +103,7 @@ const AddPatient: React.FC = () => {
             //const response = await axios.post(Api.addPatient, patient);
             const response = await apiService.addPatient(Number(userId), patient); // pass userId
             if (response.status === 200 || response.status === 201) {
-                navigate("/");
+                navigate("/patients");
             }
             setError(null);
         } catch (error) {
@@ -135,7 +145,7 @@ const AddPatient: React.FC = () => {
             <div className="card shadow p-4">
                 <Container>
                     <div className="d-flex justify-content-between align-items-center mb-4">
-                        <h1>Add Patient</h1>
+                        <h1>Edit Patient</h1>
                         <Link to={`/reception/patients`} className="btn btn-secondary">
                             <i className="fas fa-arrow-right"></i> Patient List
                         </Link>
@@ -310,4 +320,4 @@ const AddPatient: React.FC = () => {
     )
 }
 
-export default AddPatient;
+export default EditPatient;

@@ -21,9 +21,10 @@ const StaffList: React.FC = () => {
     const fetchStaff = useCallback(async () => {
         try {
             setIsLoading(true)
-            console.log("userId:" +userId)
+            console.log("userId:" +Number(userId))
             // const response = await axios.get<ApiResponse<Staff[]>>(Api.staffs)
             const response = await apiService.staffs(Number(userId)) //userId
+            console.log("response:" +response)
 
             setStaffs(response.data.data)
             setError(null)
@@ -42,7 +43,7 @@ const StaffList: React.FC = () => {
     const handleEdit = (staff: Staff) =>{
         //    navigate(`${Api.getStaff}/${staff.staffId}`);
        // navigate(`/updateStaff/${userId}/`)
-           navigate(`/updateStaff/${userId}/${staff.staffId}`);
+           navigate(`/admin/updateStaff/${userId}/${staff.staffId}`);
     }
 
     return (
@@ -81,7 +82,7 @@ const StaffList: React.FC = () => {
                                     <td>{staff.phone}</td>
                                     <td>{staff.email}</td>
                                     <td>{staff.joiningDate}</td>
-                                    <td>{staff.tillDate}</td>
+                                    <td>{staff.tillDate ? staff.tillDate : " - " }</td>
                                     <td>{staff.salary}</td>
                                     <td>{staff.status}</td>
                                     <td>{staff.address}</td>

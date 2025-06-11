@@ -1,0 +1,18 @@
+export interface LabResultDTO {
+    appointmentId: number,
+    appointmentDate: string,
+    patientId: number,
+    patientFirstName: string,
+    patientLastName: string,
+    phone:string,
+    gender: string,
+    dateOfBirth: string,
+    email: string,
+    labTestResultId: number,
+    labTestDetailId: number,
+    labPrescriptionId: number,
+    resultDescription: string,
+    resultFlag?: string,
+    resultValue: number,
+    testRemarks?: string,
+}

@@ -259,7 +259,7 @@ const EditStaff: React.FC = () => {
 
                     <div className="d-flex justify-content-between align-items-center mb-4">
                         <h1>Edit Staff</h1>
-                        <Link to={`/staffs/${userId}`} className="btn btn-secondary">
+                        <Link to={`/admin/staffs/${userId}`} className="btn btn-secondary">
                             <i className="fas fa-arrow-right"></i> Staff List
                         </Link>
                     </div>

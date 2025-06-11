@@ -8,7 +8,7 @@ const LandingPage: React.FC = () => {
         <>
             <Navbar />
             <div className="landing-page">
-                <h1>Welcome to ATS Clinic!</h1>
+                <h1 className="message">Welcome to ATS Clinic!</h1>
             </div>
         </>
     )

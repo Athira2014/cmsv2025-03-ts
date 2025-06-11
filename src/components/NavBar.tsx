@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import logo from "../assets/ATS.png"
 import { Link, useNavigate } from "react-router-dom";
 import Login from "./Login";
+import "../styles/Dashboard.css"
 
 interface NavBarProps {
     userName: string;
@@ -27,10 +28,12 @@ const NavBar: React.FC<NavBarProps> = ({ userName, onLogout }) => {
         } else if (roleIdStr === '2') {
             setHomePage('/manager');
         } else if (roleIdStr === '3') {
-            setHomePage('/doctor');
+            setHomePage('/doctorDash');
         } else if (roleIdStr === '4') {
-            setHomePage('/receptionist');
-        } else {
+            setHomePage('/reception');
+        }  else if (roleIdStr === '7') {
+            setHomePage('/laboratory');
+        }else {
             setHomePage('/unauthorized');
         }
     }, [])
@@ -62,14 +65,35 @@ const NavBar: React.FC<NavBarProps> = ({ userName, onLogout }) => {
                 <div className="collapse navbar-collapse" id="navbarNavDropdown">
                     {isLoggedIn ? (
                         // if not logged in show logout button and home and search options in the navbar
-                        <><ul className="navbar-nav me-auto">
-                            <li className="nav-item">
-                                <Link className="nav-link" to={homePage}>Home</Link>
-                            </li>
-                            <li className="nav-item">
-                                <a className="nav-link" href="#">Search</a>
-                            </li>
-                        </ul><ul className="navbar-nav me-auto">
+                        <>
+                            {/*Dashboard menu*/}
+                            <ul className="navbar-nav me-auto">
+                                <li className="nav-item dropdown custom-dropdown">
+                                    <span className="nav-link dropdown-toggle">Dashboard</span>
+                                    <ul className="dropdown-menu">
+                                        <li>
+                                            <Link className="dropdown-item" to='/admin'>Admin Dash</Link>
+                                        </li>
+                                        <li>
+                                            <Link className="dropdown-item" to='/reception'>Reception Dash</Link>
+                                        </li>
+                                        <li>
+                                            <Link className="dropdown-item" to='/doctorDash'>Doctor Dash</Link>
+                                        </li>
+                                        <li>
+                                            <Link className="dropdown-item" to='/laboratory'>Laboratory Dash</Link>
+                                        </li>
+                                    </ul>
+                                </li>
+                            </ul>
+                            <ul className="navbar-nav me-auto">
+                                <li className="nav-item">
+                                    <Link className="nav-link" to={homePage}>Home</Link>
+                                </li>
+                                <li className="nav-item">
+                                    <a className="nav-link" href="#">Search</a>
+                                </li>
+                            </ul><ul className="navbar-nav me-auto">
                                 <li className="nav-item d-flex align-items-center me-2 text-white">
                                     <i className="bi bi-person-circle me-1"></i>
                                     {userName}
